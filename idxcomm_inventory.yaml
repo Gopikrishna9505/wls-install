@@ -1,0 +1,87 @@
+all:
+   hosts:
+   
+   children:
+
+        script_hosts:
+          hosts:
+
+            patch_host:
+              ansible_host: adrut1318.cvty.com
+              ansible_user: jbsadm
+
+#
+# IDXCOMM hosts
+#
+        IDXComm:
+
+          children:
+            idxcomm_dev:
+              vars:
+                 weblogic_domain: idxcommDev
+                 admin_server_url: t3://cdrwa108.cvty.com:17501                
+              hosts:
+                dev1:
+                  ansible_host: cdrwa108.cvty.com
+                dev2:
+                  ansible_host: cdrwa109.cvty.com
+                  admin_server_migration: false
+
+            idxcomm_qa:
+              vars:
+                 weblogic_domain: idxcommIt
+                 admin_server_url: t3://ctrwa087.cvty.com:18501
+              hosts:
+                qa1:
+                  ansible_host: ctrwa087.cvty.com
+                qa2:
+                  ansible_host: ctrwa088.cvty.com
+                  admin_server_migration: false
+
+#            idxcomm_it:
+#              vars:
+#                 weblogic_domain: idxcommIt2
+#              hosts:
+#                 it1:
+#                   ansible_host: cdrwa108.cvty.com
+#                 it2:
+#                   ansible_host: cdrwa109.cvty.com
+
+#            idxcomm_uat:
+#              vars:
+#                weblogic_domain: idxcommUat
+#              hosts:
+#                uat1:
+#                  ansible_host: ctrwa087.cvty.com
+#                uat2:
+#                  ansible_host: ctrwa088.cvty.com
+
+#            idxcomm_uat2:
+#              vars:
+#                weblogic_domain: idxcommUat2
+#              hosts:
+#                uat1:
+#                  ansible_host: ctrwa087.cvty.com
+#                uat2:
+#                  ansible_host: ctrwa088.cvty.com
+
+#            idxcomm_uat3:
+#              vars:
+#                weblogic_domain: idxcommUat3
+#              hosts:
+#                uat1:
+#                  ansible_host: ctrwa087.cvty.com
+#                uat2:
+#                  ansible_host: ctrwa088.cvty.com
+
+            idxcomm_prod:
+              vars:
+                 weblogic_domain: idxcommProd 
+                 admin_server_url: t3://aprwa1305.cvty.com:18501
+              hosts:
+                prod1:
+                  ansible_host: aprwa1305.cvty.com
+                prod2: 
+                  ansible_host: aprwa1306.cvty.com
+                  admin_server_migration: false
+

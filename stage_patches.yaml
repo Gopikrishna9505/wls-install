@@ -1,0 +1,7 @@
+# file stage_patches.yaml
+
+-
+  hosts: patch_host
+  roles:
+     - fetch_patches
+

@@ -1,0 +1,15 @@
+# file ssh_keyscan2.yaml
+
+-  hosts: all
+   gather_facts: no
+
+   tasks:
+
+
+   -  name: Ensure ssh host key known
+      lineinfile:
+        path: ~/.ssh/known_hosts
+        line: "{{ lookup('pipe', 'ssh-keyscan -trsa -p' + '22 ' + inventory_hostname) }}"
+        create: yes
+        state: present
+

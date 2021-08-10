@@ -1,0 +1,101 @@
+# Use the upgrade_weblogic template to build the wlst script
+#
+
+  - name: Copy weblogic upgrade template
+    template:
+      src: upgrade_domain.j2
+      dest: /tmp/upgrade_domain.py
+      mode: '0775'
+    when:
+      admin_server_migration == true
+
+  - name: Copy domain_migration_template for 2nd host
+    template: 
+      src: migrate_domain.j2
+      dest: /tmp/migrate_domain.py
+      mode: '0775'
+    when:
+      admin_server_migration == false
+
+#  Need to invoke the domain's setDomainEnv.sh script to set the WL_HOME env var used by the wlst scripts...
+#  Need to know whether this host is admin server or not -- admin_server_migration var
+#  Need the admin server url to populate the migrate_domain template, and the admin pw
+#
+#  Mat start scripts need updates for ansible ?
+#
+#  Stop domain
+#  Backup domain
+#  Execute domain migration
+#     Manually test node manager
+#     Manually change jdk
+#  Start domain
+
+#
+#  - execute wlst.sh script, need the script location
+
+  - name:  Execute domain upgrade script on admin server
+
+    shell: |
+      ls -alrt /tmp/*.py
+      . "{{ domain_setup }}"
+
+      {{ weblogic_home}}/oracle_common/common/bin/wlst.sh /tmp/upgrade_domain.py
+    environment: "{{ env }}"
+    args:
+      executable: /bin/bash
+    register: domain_upgrade
+
+    when:
+     admin_server_migration == true
+
+  - debug:
+      var: domain_upgrade.stdout_lines
+    when: domain_upgrade.stdout_lines is defined and admin_server_migration == true
+
+
+  - name:  Remove any previous domain template jar file
+    file:
+       path: "/tmp/{{weblogic_domain}}"
+       state: absent
+    when:
+      admin_server_migration == false
+
+
+  - name:  Remove remote domain directory
+    file:
+      path: "/opt/bea/user_projects/{{ weblogic_domain}}"
+      state: absent
+    when: 
+      admin_server_migration == false
+
+
+  - name:  Execute domain migration script on remote server
+    shell: |
+      ls -alrt /tmp/*.py
+      . "{{ domain_setup }}"
+
+      {{ weblogic_home}}/oracle_common/common/bin/wlst.sh /tmp/migrate_domain.py
+    environment: "{{ env }}"
+    args:
+      executable: /bin/bash
+    register: domain_migrate
+
+    when:
+      admin_server_migration == false
+
+
+  - debug:
+      var: domain_migrate.stdout_lines
+    when: domain_migrate.stdout_lines is defined and admin_server_migration == false
+
+  - name:  Remove python admin migration script
+    file:
+      path:    /tmp/upgrade_domain.py
+      state:   absent
+
+  - name:  Remove python remote migration script
+    file:
+      path:  /tmp/migrate_domain.py
+      state: absent
+
+

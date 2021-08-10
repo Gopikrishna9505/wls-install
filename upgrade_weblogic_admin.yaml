@@ -1,0 +1,13 @@
+#file upgrade_patches_admin.yaml
+
+ -
+   hosts: all
+   vars_prompt:
+    - name: admin_password
+      prompt: What is the weblogic admin password for this domain?
+     
+   roles:
+     - upgrade_weblogic
+
+   vars:
+     admin_server_migration: true

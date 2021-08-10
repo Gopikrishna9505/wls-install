@@ -1,0 +1,9 @@
+# open the domain for upgradoing
+readDomainForUpgrade( 'domain directory' )
+
+# save the updated domain
+updateDomain()
+
+# close the domain
+closeDomain()
+

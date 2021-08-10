@@ -1,0 +1,7 @@
+# file mat_inventory.yaml
+
+-
+  hosts: all
+  roles:
+     - check_inventory
+

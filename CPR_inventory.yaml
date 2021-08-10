@@ -1,0 +1,75 @@
+all:
+   hosts:
+   
+   children:
+
+        script_hosts:
+          hosts:
+
+            patch_host:
+              ansible_host: adrut1318.cvty.com
+              ansible_user: jbsadm
+
+
+# invoke domain setup script to set Java environment for OPatch
+# weblogic_domain_setup: "/opt/bea/user_projects/{{weblogic_domain}}/bin/setDomainEnv.sh"
+            qa_matlaunchpad:
+              ansible_host: atrwa142.cvty.com
+              ansible_user: wlsadm
+
+            prod_matlaunchpad:
+              ansible_host: aprwa474.firsthealth.com
+              ansible_user: wlsadm
+
+            new_prod_matlaunchpad:
+              ansible_host: aprwa151.cvty.com
+              ansible_user: wlsadm
+#
+# CPR hosts
+#
+        CPR:
+
+          children:
+            cpr_dev:
+              vars:
+                 weblogic_domain: devPPS7
+                 
+              hosts:
+                dev1:
+                  ansible_host: adrwa2400.cvty.com
+                dev2:
+                  ansible_host: adrwa2401.cvty.com
+
+            cpr_qa:
+              vars:
+                 weblogic_domain: itPPS7       
+              hosts:
+                qa1:
+                  ansible_host: atrwa2402.cvty.com
+                qa2:
+                  ansible_host: atrwa2403.cvty.com
+
+            cpr_uat:
+              vars:
+                 #  There are 2 domains on the 2404/2405 hosts
+                 #     The uat domain admin server is on 2404
+                 #     the trn domain admin server is on 2405
+                 #  So use the admin server's setDomainEnv from  each host
+              hosts:
+                uat1:
+                  weblogic_domain: uatPPS7
+                  ansible_host: atrwa2404.cvty.com
+                uat2:
+                  weblogic_domain: trnPPS7
+                  ansible_host: atrwa2405.cvty.com
+
+            cpr_prod:
+              vars:
+                 weblogic_domain: PPSProd7
+              hosts:
+                prod1:
+                  ansible_host: aprwa2406.cvty.com
+                prod2: 
+                  ansible_host: aprwa2407.cvty.com
+
+

@@ -1,0 +1,82 @@
+all:
+   hosts:
+   
+   children:
+
+        script_hosts:
+          hosts:
+
+            patch_host:
+              ansible_host: adrut1318.cvty.com
+              ansible_user: jbsadm
+
+#
+# CMC hosts
+#
+        CMC:
+
+          children:
+            cmc_dev:
+              vars:
+                 weblogic_domain: CmcDev1
+                 admin_server_url: t3://cdrwa219.cvty.com:17001
+              hosts:
+                dev1:
+                  ansible_host: cdrwa219.cvty.com
+                dev2:
+                  ansible_host: cdrwa220.cvty.com
+                  admin_server_migration: false
+
+            cmc_sand:
+              vars:
+                 weblogic_domain: CmcSand1 
+                 admin_server_url: t3://cdrwa217.cvty.com:17001     
+              hosts:
+               sand1:
+                  ansible_host: cdrwa217.cvty.com
+
+            cmc_it2:
+              vars:
+                weblogic_domain: CmcIt2
+                admin_server_url: t3://ctrwa213.cvty.com:17001
+              hosts:
+                it2a:
+                  ansible_host: ctrwa213.cvty.com
+                it2b:
+                  ansible_host: ctrwa214.cvty.com
+                  admin_server_migration: false
+
+            cmc_it3:
+              vars:
+                weblogic_domain: CmcIt3
+                admin_server_url: t3://ctrwa215.cvty.com:17001/
+              hosts:
+                it3a:
+                  ansible_host: ctrwa215.cvty.com
+                it3b:
+                  ansible_host: ctrwa216.cvty.com
+                  admin_server_migration: false
+
+            cmc_uat:
+              vars:
+                weblogic_domain: CmcUat
+                admin_server_url: t3://ctrwa211.cvty.com:17001/
+              hosts:
+                uat1:
+                  ansible_host: ctrwa211.cvty.com
+                uat2:
+                  ansible_host: ctrwa212.cvty.com
+                  admin_server_migration: false
+
+            cmc_prod:
+              vars:
+                 weblogic_domain: CmcProd
+                 admin_server_url: t3://aprwa1752.cvty.com:17001/
+              hosts:
+                prod1:
+                  ansible_host: aprwa1752.cvty.com
+                prod2: 
+                  ansible_host: aprwa1753.cvty.com
+                  admin_server_migration: false
+
+

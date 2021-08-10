@@ -1,0 +1,35 @@
+
+  - name: Copy v12213 patch files from patch_host
+
+# puts the file in /tmp/patch_host/softrepo/corerepo/wls/patches/v12213/...
+    fetch:
+      src:  "{{weblogic_v12213_full_patch_file}}"
+      dest: /tmp
+      remote_src: yes
+    register: shell_v12213_result
+    when: bsu_patch == false and patch_rollback == false 
+
+
+  - name: Copy v12214 patch files from patch_host
+
+    # puts the file in /tmp/patch_host/softrepo/corerepo/wls/patches/v12214/..
+    fetch:
+       src:  "{{weblogic_v12214_full_patch_file}}"
+       dest: /tmp
+       remote_src: yes                           
+    register: shell_v12214_result
+    when: bsu_patch == false and patch_rollback == false
+
+# puts the file in /tmp/patch_host/softrepo/corerepo/wls/patches/Opatch/p28186730_139424_Generic.zip
+  - name: Copy OPatch patch file from patch_host
+    fetch:
+      src:  "{{current_opatch_file}}"
+      dest: /tmp
+      remote_src: yes
+    register: shell_result
+    when:  opatch_patch == true and bsu_patch == false and patch_rollback == false
+
+
+  - debug:
+         var:  shell_result.stdout_lines
+    when: shell_result.stdout_lines is defined

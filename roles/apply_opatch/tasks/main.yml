@@ -1,0 +1,103 @@
+# file ./roles/apply_patches/tasks/main.yml
+---  
+
+
+
+- 
+  name: "Check / create patch_top directory"
+
+  stat:
+     path: "{{ patch_top_directory }}"
+  register: check_directory
+
+- debug:
+     msg:  "{{ patch_top_directory }}  does not exist... creating"
+  when: check_directory.stat.exists == false
+
+
+  #  create patch_top if it doesn't exist
+- name:  "Create patch top directory"
+  file:
+    path: "{{ patch_top_directory }}"
+    state: directory
+    mode: "0750"
+  register: opatch_create_directory
+  
+- debug:
+    var: opatch_create_directory.stdout_lines
+  when: opatch_create_directory.stdout_lines is defined
+  
+  
+
+
+#  Invoke opatch lsinventory
+
+- 
+  name: "opatch list inventory"
+     
+  shell: |
+     . "{{ domain_setup }}"
+     cd "{{ patch_top_directory }}"
+     opatch lsinventory
+
+  environment: "{{ env }}"
+
+  args:
+     executable: /bin/bash
+     # chdir: "{{ patch_top_directory }}"
+  register: opatch_inventory
+
+- 
+  debug: 
+     var:  opatch_inventory.stdout_lines
+
+
+-
+  name: "apply patch to opatch itself"
+
+  shell: | 
+      . "{{ domain_setup }}" 
+      cd "{{ patch_top_directory }}"
+      cd "{{ opatch_patchtop_dir }}"
+      java -jar opatch_generic.jar -silent oracle_home={{ weblogic_home }}
+
+  environment: "{{ env }}"
+
+  args:
+     executable: /bin/bash
+  register: opatch_opatch
+  when: patch_rollback == false and opatch_patch == true and bsu_patch == false
+     
+- 
+  debug:
+     var:  opatch_opatch.stdout_lines
+
+#
+##
+#
+
+-
+  name: "apply patch to weblogic using opatch"
+
+  shell: |
+     . "{{ domain_setup }}"
+     cd "{{ patch_top_directory }}/{{ domain_weblogic_patch_id }}"
+
+     # 2 lines needed for a nasty bug which stops opatch from applying patch
+     unset CLASSPATH
+     unset WEBLOGIC_CLASSPATH
+
+     # fully pathed, with jdk explicity set for the same nasty bug
+     {{ weblogic_home }}/OPatch/opatch apply -silent -jdk {{ java_home }}
+
+  environment: "{{ env }}"
+
+  args:
+     executable: /bin/bash
+  register: weblogic_patch
+  when: patch_rollback == false and bsu_patch == false
+
+- 
+  debug:
+     var:  weblogic_patch.stdout_lines
+

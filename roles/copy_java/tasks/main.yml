@@ -1,0 +1,85 @@
+
+  - name: Copy jdk file to inventory_hostname
+
+    # copies the file in /tmp/patch_host/softrepo/corerepo/wls/patches/v12213/p31535411_122130_Generic.zip
+    copy:
+      src: "/tmp/patch_host/{{ jdk_install_file_full_path }}"
+
+      dest: "{{jdk_destination_directory}}"
+    register: shell_result
+    when: install_jdk  == true
+
+
+  - name: Extract jdk  gz files
+    command: "gunzip -f {{jdk_install_file}}" 
+    args: 
+       chdir: "{{jdk_destination_directory}}"
+       warn: false
+    register: shell_result
+    when: install_jdk == true
+
+  - name: Extract jdk  tar file
+    command: "tar -xf {{jdk_tar_file}}"
+    args:
+       chdir: "{{jdk_destination_directory}}"
+       warn: false
+    register: shell_result
+    when: install_jdk == true
+
+  - name: Remove jdk tar file
+    file:
+      path:  "{{ jdk_destination_directory}}/{{jdk_tar_file}}"
+      state: absent
+    register: delete_tar
+    when: install_jdk == true
+
+  - name: Create middleware directories
+
+    stat:
+         path: "{{ item }}"
+    with_items:
+         - "{{ middleware_directories }}"
+    register: check_directory
+
+
+  - name: Create required directories
+
+    file:
+      path: "{{ item.item }}"
+      state: directory
+      mode: '0775'
+
+    when: item.stat.exists == false
+
+    loop:
+           "{{ check_directory.results }}"
+
+
+  - name: Check middleware symbolic links
+    stat:
+        path: "{{ item.0 }}"
+    with_items:
+         - "{{ middleware_symlinks }}"
+
+    register: check_symlinks
+
+
+
+  - name:  Create any missing symbolic links
+
+    file:
+       dest: "{{ item.item.0 }}"
+       src: "{{ item.item.1 }}"
+       state: link
+
+       path: "{{ item.item }}"
+
+    when: item.stat.exists == false
+
+    loop:
+           "{{ check_symlinks.results }}"
+
+    register: create_directories
+
+
+

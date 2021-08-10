@@ -1,0 +1,7 @@
+# file extract_weblogic.yaml
+
+-
+  hosts: all
+  roles:
+     - install_weblogic
+

@@ -1,0 +1,8 @@
+# file upgrade_patches.yaml
+
+ -
+   hosts: all
+     
+   roles:
+     - post_migration
+

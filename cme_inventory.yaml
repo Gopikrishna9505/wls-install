@@ -1,0 +1,64 @@
+all:
+   hosts:
+   
+   children:
+
+        script_hosts:
+          hosts:
+
+            patch_host:
+              ansible_host: adrut1318.cvty.com
+              ansible_user: jbsadm
+
+#
+# CME/IME hosts
+#
+        IME:
+
+          children:
+            ime_dev:
+              vars:
+                 weblogic_domain: ImeDev
+                 admin_server_url: t3://adrwa030.cvty.com:33001
+              hosts:
+                dev1:
+                  ansible_host: adrwa030.cvty.com
+                dev2:
+                  ansible_host: adrwa031.cvty.com
+                  admin_server_migration: false
+
+            ime_qa:
+              vars:
+                weblogic_domain: ImeQa
+                admin_server_url: t3://atrwa032.cvty.com:35001/
+              hosts:
+                qa1:
+                  ansible_host: atrwa032.cvty.com
+                qa2:
+                  ansible_host: atrwa033.cvty.com
+                  admin_server_migration: false
+
+
+            ime_uat:
+              vars:
+                weblogic_domain: ImeUat
+                admin_server_url: t3://atrwa032.cvty.com:36301/
+              hosts:
+                uat1:
+                  ansible_host: atrwa032.cvty.com
+                uat2:
+                  ansible_host: atrwa033.cvty.com
+                  admin_server_migration: false
+
+            ime_prod:
+              vars:
+                 weblogic_domain: ImeProd
+                 admin_server_url: t3://http://aprwa034.cvty.com:37001//
+              hosts:
+                prod1:
+                  ansible_host: aprwa034.cvty.com
+                prod2: 
+                  ansible_host: aprwa035.cvty.com
+                  admin_server_migration: false
+
+

@@ -1,0 +1,7 @@
+# file mat_stop.yaml
+
+-
+  hosts: all
+  roles:
+     - mat_stop
+

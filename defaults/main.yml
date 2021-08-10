@@ -1,0 +1,36 @@
+# file:  ./defaults/main.yml
+---
+
+# adrut1318
+#
+#
+
+# repository directory for weblogic version 12.2.1.3
+weblogic_12213_patch_dir: /softrepo/corerepo/wls/patches/v12213/
+
+# repository directory for weblogic version 12.1.3
+weblogic_v1213_patch_dir: /softrepo/corerepo/wls/patches/v1213
+
+# weblogic patch file name
+weblogic_patch_file: p31535411_122130_Generic.zip
+
+# full path to Weblogic patch file
+weblogic_version_patch_file: "{{weblogic_12213_patch_dir}}/{{weblogic_patch_file}}"
+
+# opatch file name
+opatch_patch_file: p28186730_139424_Generic.zip
+
+# opatch directory
+opatch_patch_dir: /softrepo/corerepo/wls/patches/Opatch/
+
+# full path to OPatch patch file
+current_opatch_file: "{{opatch_patch_dir}}{{opatch_patch_file}}"
+
+# is opatch being patched?
+opatch_patch: true
+
+# weblogic home directory on target host
+weblogic_home: /opt/bea/12c/wlserver_12.2.1.3/
+
+env:
+  PATH: "{{ weblogic_home }}/OPatch:$PATH"

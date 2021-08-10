@@ -1,0 +1,16 @@
+--- 
+# file: roles/mat_stop/tasks/main.yml
+#
+   -
+       name: "Call mat_stop script" 
+       command: ./mat_stop.sh
+       # the mat_stop.sh script has a sleep 300 after it shuts down managed servers before the nodemanager is shutdown
+       async: 360
+       poll: 5
+       args:
+          chdir: "{{matlp_home}}"
+       register: shell_result
+
+   -
+       debug:
+         var:  shell_result.stdout_lines

@@ -1,0 +1,39 @@
+
+  - name: Copy weblogic patch file to inventory_hostname
+
+    # copies the file in /tmp/patch_host/softrepo/corerepo/wls/patches/v12213/p31535411_122130_Generic.zip
+    copy:
+      src: "/tmp/patch_host/{{ weblogic_v12213_full_patch_file }}"
+      dest: "{{patch_top_directory}}"
+    register: shell_result
+    when: patch_rollback == false
+
+
+    # copies the file in /tmp/patch_host/softrepo/corerepo/wls/patches/Opatch/p28186730_139424_Generic.zip
+  - name: Copy OPatch patch file to inventory_hostname
+    copy:
+      src: "/tmp/patch_host/{{current_opatch_file}}"
+      dest:  "{{patch_top_directory}}"
+    register: shell_result
+    when:  opatch_patch == true and bsu_patch == false and patch_rollback == false
+
+  - debug:
+         var:  shell_result.stdout_lines
+
+
+  - name: Extract weblogic patch files
+    command: "unzip -o {{weblogic_v12213_patch_file}}" 
+    args: 
+       chdir: "{{patch_top_directory}}"
+       warn: false
+    register: shell_result
+    when: patch_rollback == false
+
+
+  - name: Extract OPatch patch files
+    command: "unzip -o {{opatch_patch_file}}"
+    args:
+       chdir: "{{patch_top_directory}}"
+       warn: false
+    register: shell_result
+    when: opatch_patch == true and bsu_patch == false and patch_rollback == false

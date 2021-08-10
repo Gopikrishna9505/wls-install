@@ -1,0 +1,7 @@
+# file extract_patches.yaml
+
+-
+  hosts: all
+  roles:
+     - copy_patches
+

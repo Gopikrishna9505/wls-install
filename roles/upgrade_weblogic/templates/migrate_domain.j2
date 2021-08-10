@@ -1,0 +1,21 @@
+import os
+
+wlsHome = os.getenv( 'WL_HOME' )
+mwHome = os.path.join( wlsHome, '..' )
+
+connect('{{admin_user}}', '{{admin_password}}', '{{admin_server_url}}' )
+
+templatePath = '/tmp/{{weblogic_domain}}.jar'
+timeout = '180000'
+
+writeTemplate( templatePath, 180000 ) 
+
+disconnect()
+
+readTemplate( templatePath )
+
+domainPath = '{{domain_root_dir}}{{weblogic_domain}}' 
+
+writeDomain( domainPath )
+
+

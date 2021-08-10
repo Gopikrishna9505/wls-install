@@ -1,0 +1,66 @@
+     - name: After installing binaries, check that required symlinks are available
+
+       stat:
+        path: "/webapps/{{weblogic_domain}}/{{ item.0 }}"
+       with_items:
+         - "{{ required_symlinks }}"
+
+       register: check_symlinks
+
+
+     - name:  Remove existing links
+       file:
+         path: "/webapps/{{weblogic_domain}}/{{ item.item.0 }}"
+         state: absent
+
+       when: item.stat.exists == true
+
+       loop:
+          "{{ check_symlinks.results }}"
+
+       register: remove_symlinks
+
+
+     - name: check for required symlinks
+
+       stat:
+        path: "/webapps/{{weblogic_domain}}/{{ item.0 }}"
+       with_items:
+         - "{{ required_symlinks }}"
+
+       register: check_symlinks
+
+
+     - name:  Create any missing symbolic links
+
+       file:
+         dest: "/webapps/{{weblogic_domain}}/{{ item.item.0 }}"
+         src: "{{ item.item.1 }}"
+
+         state: link
+
+         path: "{{ item.item }}"
+
+       when: item.stat.exists == false
+
+       loop:
+           "{{ check_symlinks.results }}"
+
+       register: create_directories
+
+
+     - name: After creating symlinks, check that required symlinks are available
+
+       stat:
+        path: "/webapps/{{weblogic_domain}}/{{ item.0 }}"
+       with_items:
+         - "{{ required_symlinks }}"
+
+       register: check_symlinks_after_creating
+
+
+     - debug:
+         msg: "{{ item }} does not exist or is not a link"
+       when: item.stat.exists == false or item.stat.islnk == false 
+       loop: "{{ check_symlinks_after_creating.results }}"
+

@@ -1,0 +1,176 @@
+# file:  group_vars/all
+---
+
+# repository directory for weblogic versions
+weblogic_v12214_patch_dir: /softrepo/corerepo/wls/patches/v12214/
+weblogic_v12213_patch_dir: /softrepo/corerepo/wls/patches/v12213/
+weblogic_v1213_patch_dir: /softrepo/corerepo/wls/patches/v1213
+weblogic_v1036_patch_dir: /softrepo/corerepo/wls/patches/v1036
+
+# repository directory for weblogic installation files
+weblogic_install_dir: /softrepo/corerepo/wls/installs/
+weblogic_v12214_install_file: fmw_12.2.1.4.0_wls_lite_Disk1_1of1.zip
+weblogic_v12214_directory: /opt/bea/12c/wlserver_12.2.1.4
+
+weblogic_v12214_install_jar: fmw_12.2.1.4.0_wls_lite_generic.jar
+
+
+# weblogic patch file name - edit as needed for each patch release
+
+# April 2021 psu
+#
+## patches for weblogic 12.2.1.3
+weblogic_v12213_patch_file: p32697734_122130_Generic.zip
+weblogic_v12213_patch_id:    32697734
+
+
+## patches for weblogic 12.2.1.4
+weblogic_v12214_patch_file: p32698246_122140_Generic.zip
+weblogic_v12214_patch_id:    32698246
+
+# January 2021 psu
+#
+## patches for Weblogic 12.2.1.3
+#weblogic_v12213_patch_file: p32300397_122130_Generic.zip
+#weblogic_v12213_patch_id:    32300397
+
+## patches for Weblogic 12.2.1.4
+#weblogic_v12214_patch_file: p32253037_122140_Generic.zip
+#weblogic_v12214_patch_id:    32253037
+
+
+#october 2020 psu
+#
+#weblogic_v12213_patch_file:  p31961038_122130_Generic.zip
+#weblogic_v12213_patch_id: 31961038
+
+
+#october CVE-2020-14750
+#weblogic_v12213_patch_file:  p32097173_12213201001_Generic.zip
+#weblogic_v12213_patch_id: 32097173
+
+
+# patches for weblogic 10.3.6
+weblogic_v1036_patch_file:   something.zip
+weblogic_v1036_patch_id: 9999999
+
+
+# full path to Weblogic patch file
+
+weblogic_v12214_full_patch_file: "{{weblogic_v12214_patch_dir}}/{{weblogic_v12214_patch_file}}"
+weblogic_v12213_full_patch_file: "{{weblogic_v12213_patch_dir}}/{{weblogic_v12213_patch_file}}"
+weblogic_v1036_full_patch_file: "{{weblogic_v1036_patch_dir}}/{{weblogic_v1036_patch_file}}"
+
+
+# full path to weblogic installation file
+weblogic_v12214_install_full_path: "{{ weblogic_install_dir }}/{{ weblogic_v12214_install_file }}"
+
+
+####################################################
+# this section applies to patches for opatch itself
+####################################################
+# opatch file name
+
+# opatch January 2021
+opatch_patch_file: p28186730_139425_Generic.zip
+
+# opatch July 2020
+#opatch_patch_file: p28186730_139424_Generic.zip
+
+# opatch directory on adrut1318
+opatch_patch_dir: /softrepo/corerepo/wls/patches/Opatch/
+
+# opatch may use different values for patch id vs the extracted directory
+# opatch patch id
+
+# opatch January 2021
+opatch_patch_id: 28186730
+
+# opatch July 2020
+#opatch_patch_id: 28186730
+
+# opatch patch directory
+opatch_patchtop_dir: 6880880
+
+# full path to OPatch patch file
+current_opatch_file: "{{opatch_patch_dir}}{{opatch_patch_file}}"
+
+# java home directory - for opatch -jre parameter
+java_home: /opt/bea/jdk1.8.0_281
+
+# - end of opatch section ---
+
+###########################################
+# this section is for migration variables 
+###########################################
+
+# true - domain migration is being done on admin server host
+# false - domain migration is being done on remote host
+admin_server_migration: true
+admin_user: wlsadm
+
+# directory containing domain subdirectories - this is used for the domain upgrade / migration script
+domain_root_dir: /opt/bea/user_projects/
+
+#
+##lrwxrwxrwx 1 wlsadm webengfs  30 Jul 23  2018 mwHome -> /opt/bea/12c/wlserver_12.2.1.2
+#lrwxrwxrwx 1 wlsadm webengfs  40 Jul 23  2018 wlHome -> /opt/bea/12c/wlserver_12.2.1.2/wlserver/
+#
+required_symlinks:
+  -  [ 'wlHome', '/opt/bea/12c/wlserver_12.2.1.4/wlserver' ]
+  -  [ 'mwHome', '/opt/bea/12c/wlserver_12.2.1.4' ]
+  
+###########################################
+#  this section controls rollback
+###########################################
+#
+# true = rolling back patch, false = applying patch
+#  Note:
+#
+# There is no mechanism to revert OPatch to an older version.
+# To revert OPatch, restore the backup for your ORACLE_HOME
+
+patch_rollback: false
+
+# true = is there also a patch for opatch itself
+opatch_patch: false
+
+
+# true = using bsu, false = opatch
+bsu_patch: false
+
+
+##########################################
+# this section applies to jdk installs
+##########################################
+#
+jdk_repository: /softrepo/corerepo/java
+
+# jdk 1.8_291 Apr 2021
+jdk_install_file: jdk-8u291-linux-x64.tar.gz
+jdk_tar_file:     jdk-8u291-linux-x64.tar
+
+
+# jdk 1.8_281 Jan 2021
+#jdk_install_file: jdk-8u281-linux-x64.tar.gz
+#jdk_tar_file:     jdk-8u281-linux-x64.tar
+
+jdk_destination_directory: /opt/bea
+
+jdk_install_file_full_path: "{{jdk_repository}}/{{jdk_install_file}}"
+
+install_jdk: true
+
+middleware_directories: 
+  - "/webapps/middleware"
+
+middleware_symlinks:
+  - [ '/webapps/middleware/javaHome', '/opt/bea/jdk1.8.0_291' ]
+
+
+
+########################################
+#   This section controls mat scripts  
+#######################################
+
+using_matlaunchpad_scripts: true

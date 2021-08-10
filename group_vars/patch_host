@@ -1,0 +1,23 @@
+# file:  group_vars/patch_host
+#
+# used by:  stage_patches.yaml 
+#
+# patch directories on adrut1318 - patch staging host
+#
+
+weblogic_12213_patch_dir: /softrepo/corerepo/wls/patches/v12213/
+
+weblogic_1213_patch_dir: /softrepo/corerepo/wls/patches/v1213/
+
+weblogic_patch_file: p31535411_122130_Generic.zip
+
+weblogic_version_patch_file: "{{weblogic_12213_patch_dir}}/{{weblogic_patch_file}}"
+
+# opatch file name
+opatch_patch_file: p28186730_139424_Generic.zip
+ 
+# opatch directory
+opatch_patch_dir: /softrepo/corerepo/wls/patches/Opatch/
+                          
+# full path to OPatch patch file
+current_opatch_file: "{{opatch_patch_dir}}{{opatch_patch_file}}" 

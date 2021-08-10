@@ -1,0 +1,9 @@
+# file apply_opatch.yaml
+
+-
+  hosts: CPR
+
+  roles:
+    - apply_opatch
+
+

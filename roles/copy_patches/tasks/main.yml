@@ -1,0 +1,79 @@
+
+
+  #  create patch_top if it doesn't exist
+  - name:  "Create patch top directory"
+    file:
+      path: "{{ patch_top_directory }}"
+      state: directory
+      mode: "0750"
+    register: opatch_create_directory
+  
+  - debug:
+      var: opatch_create_directory.stdout_lines
+    when: opatch_create_directory.stdout_lines is defined
+
+  - name: Copy weblogic patch file to inventory_hostname
+
+    # copies the file in /tmp/patch_host/softrepo/corerepo/wls/patches/..
+    copy:
+      src: "/tmp/patch_host/{{ domain_weblogic_full_patch_file }}"
+      dest: "{{patch_top_directory}}"
+    register: copy_weblogic_patch_result
+    when: patch_rollback == false
+
+  - debug:
+       var: copy_weblogic_patch_result.stdout_lines
+    when: copy_weblogic_patch_result.stdout_lines is defined
+
+    # copies the file in /tmp/patch_host/softrepo/corerepo/wls/patches/Opatch/...
+  - name: Copy OPatch patch file to inventory_hostname
+    copy:
+      src: "/tmp/patch_host/{{current_opatch_file}}"
+      dest:  "{{patch_top_directory}}"
+    register: copy_opatch_patch_result
+    when:  opatch_patch == true and bsu_patch == false and patch_rollback == false
+
+  - debug:
+         var:  copy_opatch_patch_result.stdout_lines
+    when: copy_opatch_patch_result.stdout_lines is defined
+
+  - name: Extract weblogic patch files
+    command: "unzip -o {{domain_weblogic_patch_file}}" 
+    args: 
+       chdir: "{{patch_top_directory}}"
+       warn: false
+    register: extract_weblogic_patch_result
+    when: patch_rollback == false
+
+  - debug:
+       var: extract_weblogic_patch_result.stdout_lines
+    when: extract_weblogic_patch_result.stdout_lines is defined
+
+  - name: Extract OPatch patch files
+    command: "unzip -o {{opatch_patch_file}}"
+    args:
+       chdir: "{{patch_top_directory}}"
+       warn: false
+    register: extract_opatch_patch_result
+    when: opatch_patch == true and bsu_patch == false and patch_rollback == false
+
+  - debug:
+      var: extract_opatch_patch_result.stdout_lines
+    when: extract_opatch_patch_result.stdout_lines is defined
+
+  - name:  Remove weblogic patch zip file
+    file: 
+      path: "{{ patch_top_directory }}/{{ domain_weblogic_patch_file}}"
+      state: absent
+    when:
+        patch_rollback == false and bsu_patch == false
+
+  - name: Remove opatch patch zip file
+    file: 
+      path: "{{ patch_top_directory }}/{{ opatch_patch_file }}"
+      state: absent
+    when:
+      patch_rollback == false and bsu_patch == false and opatch_patch == true
+
+
+      

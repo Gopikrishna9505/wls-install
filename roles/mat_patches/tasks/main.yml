@@ -1,0 +1,194 @@
+--- 
+# file: roles/mat_patch/tasks/main.yml
+#
+-
+   name: "Call mat_stop script" 
+   command: ./mat_stop.sh
+       # the mat_stop.sh script has a sleep 300 after it shuts down managed servers before the nodemanager is shutdown
+   async: 540
+   poll: 5
+   args:
+      chdir: "{{matlp_home}}"
+   register: shell_result
+   when:
+      using_matlaunchpad_scripts == true
+-
+   debug:
+     var:  shell_result.stdout_lines
+   when: shell_result.stdout_lines is defined
+#
+#   Check inventory
+#
+
+- 
+  name: "opatch list inventory"
+     
+  shell: |
+     EXPORT JAVA_HOME="{{ java_home }}"
+     EXPORT ORACLE_HOME="{{ weblogic_home }}"
+     EXPORT PATH=$ORACLE_HOME/OPatch:$JAVA_HOME/bin:$PATH
+     cd "{{ patch_top_directory }}"
+     opatch lsinventory
+
+  environment: "{{ env }}"
+
+  args:
+     executable: /bin/bash
+     # chdir: "{{ patch_top_directory }}"
+  register: opatch_inventory
+  when: patch_rollback == false and bsu_patch == false
+
+- 
+  debug: 
+     var:  opatch_inventory.stdout_lines
+
+
+-
+  name: "apply patch to opatch itself"
+
+  shell: | 
+      EXPORT JAVA_HOME="{{ java_home }}"
+      EXPORT ORACLE_HOME="{{ weblogic_home }}"
+      EXPORT PATH=$ORACLE_HOME/OPatch:$JAVA_HOME/bin:$PATH      
+      cd "{{ patch_top_directory }}"
+      cd "{{ opatch_patchtop_dir }}"
+
+
+      java -jar opatch_generic.jar -silent oracle_home={{ weblogic_home }}
+
+  environment: "{{ env }}"
+
+  args:
+     executable: /bin/bash
+  register: opatch_opatch
+  when: patch_rollback == false and opatch_patch == true and bsu_patch == false
+     
+- 
+  debug:
+     var:  opatch_opatch.stdout_lines
+  when: opatch_opatch.stdout_lines is defined
+    
+#
+##  patch weblogic 
+#
+
+-
+  name: "apply patch to weblogic using opatch"
+
+  shell: |
+     EXPORT JAVA_HOME="{{ java_home }}"
+     EXPORT ORACLE_HOME="{{ weblogic_home }}"
+     EXPORT PATH=$ORACLE_HOME/OPatch:$JAVA_HOME/bin:$PATH
+     cd "{{ patch_top_directory }}/{{ domain_weblogic_patch_id }}"
+
+     # 2 lines needed for a nasty bug which stops opatch from applying patch
+     unset CLASSPATH
+     unset WEBLOGIC_CLASSPATH
+    
+     # fully pathed, with jdk explicity set for the same nasty bug
+     {{ weblogic_home }}/OPatch/opatch apply -silent -jdk {{ java_home }}
+
+
+  environment: "{{ env }}"
+
+  args:
+     executable: /bin/bash
+  register: weblogic_patch
+  when: patch_rollback == false and bsu_patch == false
+
+- 
+  debug:
+     var:  weblogic_patch.stdout_lines
+  when: weblogic_patch.stdout_lines is defined
+
+#
+##  Check opatch inventory before rolling back ( if rollback is being performed ) 
+#
+
+- 
+  name: "opatch list inventory before rollback"
+     
+  shell: |
+     EXPORT JAVA_HOME="{{ java_home }}"
+     EXPORT ORACLE_HOME="{{ weblogic_home }}"
+     EXPORT PATH=$ORACLE_HOME/OPatch:$JAVA_HOME/bin:$PATH
+     . "{{ domain_setup }}"
+     cd "{{ patch_top_directory }}"
+     opatch lsinventory
+
+  environment: "{{ env }}"
+
+  args:
+     executable: /bin/bash
+  register: opatch_rollback_inventory
+  when: patch_rollback == true and bsu_patch == false 
+- 
+  debug: 
+     var:  opatch_rollback_inventory.stdout_lines
+  when: opatch_rollback_inventory.stdout_lines is defined
+
+#
+## patches are rolled back in the reverse sequence compared to when they were applied
+#
+
+-
+  name: "rollback patch from weblogic using opatch"
+
+  shell: |
+     EXPORT JAVA_HOME="{{ java_home }}"
+     EXPORT ORACLE_HOME="{{ weblogic_home }}"
+     EXPORT PATH=$ORACLE_HOME/OPatch:$JAVA_HOME/bin:$PATH
+     cd "{{ patch_top_directory }}/{{ domain_weblogic_patch_id }}"
+     opatch rollback -id {{ domain_weblogic_patch_id }} -silent
+
+  environment: "{{ env }}"
+
+  args:
+     executable: /bin/bash
+     # chdir: "{{ patch_top_directory }}/{{ domain_weblogic_patch_id }}"
+  register: weblogic_rollback
+  when: patch_rollback == true and bsu_patch == false
+
+- 
+  debug:
+     var:  weblogic_rollback.stdout_lines
+  when: weblogic_rollback.stdout_lines is defined
+
+
+#-
+#  name: "rollback patch from opatch itself using opatch"
+#  There is no rollback for opatch - restore backup of ORACLE_HOME
+#
+#  shell: |
+#     . "{{ domain_setup }}"
+#     cd "{{ patch_top_directory }}/{{ opatch_patchtop_dir }}"
+#     opatch rollback -id {{opatch_patch_id}}  -silent
+#
+#  environment: "{{ env }}"
+#
+#  args:
+#     executable: /bin/bash
+#     # chdir: "{{ patch_top_directory }}/{{ opatch_patchtop_dir }}"
+#  register: opatch_rollback
+#  when: patch_rollback == true and opatch_patch == true and bsu_patch == false
+#
+#- 
+#  debug:
+#     var:  opatch_rollback.stdout_lines
+
+-
+    name: "Call mat_start script" 
+    command: ./mat_start.sh
+    # the mat_start script creates background processes to start managed servers beyond the first one in a domain;
+    #   2nd, 3rd.. servers start in the background
+    async: 600
+    poll: 5
+    args:
+       chdir: "{{matlp_home}}"
+    register: shell_start_result
+    when:
+        using_matlaunchpad_scripts == true
+-
+    debug:
+      var:  shell_start_result.stdout_lines
+    when: shell_start_result.stdout_lines is defined

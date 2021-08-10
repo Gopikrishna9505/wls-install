@@ -1,0 +1,9 @@
+# file rollback_opatch.yaml
+
+-
+  hosts: CPR
+
+  roles:
+    - rollback_opatch
+
+

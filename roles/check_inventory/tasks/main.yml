@@ -1,0 +1,39 @@
+---  
+
+- 
+  name: "Check / create patch_top directory"
+  
+  stat:
+     path: "{{ patch_top_directory }}"
+  register: check_directory
+
+- debug:
+     msg:  "{{ patch_top_directory }}  does not exist... creating"
+  when: check_directory.stat.exists == false
+
+
+  #  create patch_top if it doesn't exist
+- name:  "Create patch top directory"
+  file:
+   path: "{{ patch_top_directory }}"
+   state: directory
+   mode: "0750"
+  register: opatch_create_directory
+
+- debug:
+    var: opatch_create_directory.stdout_lines
+  when: opatch_create_directory.stdout_lines is defined
+
+
+
+- name:  Opatch list inventory 
+  # run opatch inventory
+  shell: |
+     . "{{ domain_setup }}"
+     cd "{{ patch_top_directory }}"
+     opatch lsinventory
+
+  environment: "{{ env }}"
+
+  args:
+     executable: /bin/bash

@@ -1,0 +1,69 @@
+# file ./roles/apply_patches/tasks/main.yml
+---  
+
+- 
+  name: "opatch list inventory"
+     
+  shell: |
+     . "{{ domain_setup }}"
+     cd "{{ patch_top_directory }}"
+     opatch lsinventory
+
+  environment: "{{ env }}"
+
+  args:
+     executable: /bin/bash
+     # chdir: "{{ patch_top_directory }}"
+  register: opatch_inventory
+
+- 
+  debug: 
+     var:  opatch_inventory.stdout_lines
+
+#
+## patches are rolled back in the reverse sequence compared to when they were applied
+#
+
+-
+  name: "rollback patch from weblogic using opatch"
+
+  shell: |
+     . "{{ domain_setup }}"
+     cd "{{ patch_top_directory }}/{{ domain_weblogic_patch_id  }}"
+     opatch rollback -id {{ domain_weblogic_patch_id }} -silent
+
+  environment: "{{ env }}"
+
+  args:
+     executable: /bin/bash
+     # chdir: "{{ patch_top_directory }}/{{ domain_weblogic_patch_id }}"
+  register: weblogic_rollback
+  when: patch_rollback == true and bsu_patch == false
+
+- 
+  debug:
+     var:  weblogic_rollback.stdout_lines
+
+
+#-
+#  name: "rollback patch from opatch itself using opatch"
+#  There is no rollback for opatch - restore backup of ORACLE_HOME
+#
+#  shell: |
+#     . "{{ domain_setup }}"
+#     cd "{{ patch_top_directory }}/{{ opatch_patchtop_dir }}"
+#     opatch rollback -id {{opatch_patch_id}}  -silent
+#
+#  environment: "{{ env }}"
+#
+#  args:
+#     executable: /bin/bash
+#     # chdir: "{{ patch_top_directory }}/{{ opatch_patchtop_dir }}"
+#  register: opatch_rollback
+#  when: patch_rollback == true and opatch_patch == true and bsu_patch == false
+#
+#- 
+#  debug:
+#     var:  opatch_rollback.stdout_lines
+
+

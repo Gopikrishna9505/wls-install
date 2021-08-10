@@ -1,0 +1,8 @@
+# file ssh_keyscan.yml
+
+- hosts: all
+  gather_facts: no
+  tasks: 
+   - name: run ssh_keyscan to add keys to known hosts
+     local_action: shell ssh-keyscan {{ inventory_hostname }} >> ~/.ssh/known_hosts
+

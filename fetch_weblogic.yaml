@@ -1,0 +1,7 @@
+# file fetch_weblogic.yaml
+
+-
+  hosts: patch_host
+  roles:
+     - fetch_weblogic
+

@@ -1,0 +1,15 @@
+--- 
+   -
+       name: "Call mat_start script" 
+       command: ./mat_start.sh
+       # the mat_start script creates background processes to start managed servers beyond the first one in a domain;
+       #   2nd, 3rd.. servers start in the background
+       async: 360
+       poll: 5
+       args:
+          chdir: "{{matlp_home}}"
+       register: shell_result
+
+   -
+       debug:
+         var:  shell_result.stdout_lines

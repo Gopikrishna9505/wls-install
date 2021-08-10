@@ -1,0 +1,36 @@
+ansible_connection: paramiko
+# ansible_connection: ssh
+
+ansible_user: wlsadm
+
+# directories on the weblogic host(s)
+weblogic_home: /opt/bea/12c/wlserver_12.2.1.4/
+weblogic_version: v12214
+weblogic_12c_directory: /opt/bea/12c
+
+java_home: /opt/bea/jdk1.8.0_131
+
+
+# patch files
+domain_weblogic_full_patch_file: "{{weblogic_v12214_full_patch_file}}"
+domain_weblogic_patch_id: "{{ weblogic_v12214_patch_id }}"
+domain_weblogic_patch_file: "{{ weblogic_v12214_patch_file }}"
+
+patch_top_directory: "{{ weblogic_home }}OPatch/PATCH_TOP"
+matlp_home: /opt/weblogic/adm/MATLaunchPad/
+
+#   domain_setup var is used to set java environment for Opatch and wlst
+domain_setup: "/opt/bea/user_projects/{{weblogic_domain}}/bin/setDomainEnv.sh"
+
+# true = using bsu, false = opatch
+bsu_patch: false
+
+using_matlaunchpad_scripts: false
+
+# environment for OPatch commands on the weblogic host(s)
+
+env:
+  PATH: "{{ weblogic_home }}/OPatch:{{ java_home }}/bin:$PATH:/bin:/usr/bin:/usr/local/bin:/usr/local/sbin:/usr/sbin:"
+  ORACLE_HOME: "{{ weblogic_home }}"
+  JAVA_HOME: "{{ java_home }}"
+

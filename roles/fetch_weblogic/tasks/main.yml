@@ -1,0 +1,14 @@
+# file: fetch_java/tasks/main.yml
+
+ - name: Copy weblogic install file from patch_host
+   fetch:
+      src:  "{{ weblogic_v12214_install_full_path }}"
+      dest: /tmp
+      remote_src: yes
+   register: shell_result
+   # when:  install_jdk == true
+
+ - debug:
+         var:  shell_result.stdout_lines
+   when: shell_result.stdout_lines is defined
+

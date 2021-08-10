@@ -1,0 +1,35 @@
+
+  - name: Copy weblogic file to inventory_hostname
+
+    # copies the file in /tmp/patch_host/softrepo/corerepo/wls/...
+    copy:
+      src: "/tmp/patch_host/{{ weblogic_v12214_install_full_path }}"
+
+      dest: "{{weblogic_12c_directory}}"
+    register: shell_result
+    #when: install_jdk  == true
+
+
+  - name: Extract weblogic zip files
+    command: "unzip -o {{ weblogic_v12214_install_file }}" 
+    args: 
+       chdir: "{{weblogic_12c_directory}}"
+       warn: false
+    register: extract_result
+    #when: install_jdk == true
+
+  - debug: 
+      var: extract_result.stdout_lines
+    when:  extract_result.stdout_lines is defined
+
+
+  - name: Remove zip file
+    file:
+      path: "{{weblogic_12c_directory}}/{{weblogic_v12214_install_file}}"
+      state: absent
+    register: delete_result
+
+  - debug:
+      var: delete_result.stdout_lines
+    when: delete_result.stdount_lines is defined
+

@@ -1,0 +1,59 @@
+
+  - name: Copy weblogic silent response file to inventory_hostname
+
+    # copies the file in files directory 
+    copy:
+      src: silent-weblogic.rsp
+
+      dest: "{{weblogic_12c_directory}}"
+    register: shell_result
+    #when: install_jdk  == true
+
+
+
+  #  create patch_top if it doesn't exist
+  - name:  Create new weblogic home directory
+    file:
+      path: "{{ weblogic_v12214_directory }}"
+      state: directory
+      mode: "0750"
+    register: create_directory
+  
+  # copy oraInst.loc file
+  - name: "Copy oraInst.loc"
+    shell:
+        cp /opt/bea/12c/wlserver_12.2.1.2/oraInst.loc /tmp
+
+
+  # execute weblogic installer
+  - name: Execute weblogic installation
+    
+    shell: |
+      export JAVA_HOME="{{ java_home }}" 
+      export PATH=$JAVA_HOME/bin:$PATH
+      cd "{{weblogic_12c_directory}}"
+      java -jar "./{{ weblogic_v12214_install_jar }}" -silent -responseFile {{weblogic_12c_directory}}/silent-weblogic.rsp -invPtrLoc /tmp/oraInst.loc
+ 
+    args: 
+       chdir: "{{weblogic_12c_directory}}"
+       warn: false
+    register: install_result
+
+  - debug: 
+      var: install_result.stdout_lines
+    when:  install_result.stdout_lines is defined
+
+
+  # remove silent response file
+  - name: Remove weblogic silent response file
+    file:
+      path: "{{ weblogic_12c_directory }}/silent-weblogic.rsp"
+      state: absent
+
+
+  # remove installation jar file
+  - name: Remove weblogic installation jar
+    file:
+      path: "{{ weblogic_12c_directory }}/{{ weblogic_v12214_install_jar}}"
+      state: absent
+  

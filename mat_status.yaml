@@ -1,0 +1,7 @@
+# file mat_start.yaml
+
+-
+  hosts: CPR
+  roles:
+     - mat_status
+

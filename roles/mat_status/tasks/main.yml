@@ -1,0 +1,13 @@
+--- 
+   -
+       name: "Call mat_status script" 
+       command: ./mat_status.sh
+       async: 360
+       poll: 5
+       args:
+          chdir: "{{matlp_home}}"
+       register: shell_result
+
+   -
+       debug:
+         var:  shell_result.stdout_lines
